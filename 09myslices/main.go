@@ -38,5 +38,6 @@ func main() {
 	//more features on slices -->> sorting which arrays don't have
 	sort.Ints(highScores)
 	fmt.Println(highScores)
+	fmt.Println(sort.IntsAreSorted(highScores))
 
 }
