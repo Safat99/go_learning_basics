@@ -16,7 +16,8 @@ type course struct {
 
 func main() {
 	fmt.Println("Welcome to json video")
-	EncodeJson()
+	// EncodeJson()
+	DecodeJson()
 }
 
 func EncodeJson() {
@@ -37,4 +38,40 @@ func EncodeJson() {
 
 	fmt.Printf("%s\n", finalJson)
 
+}
+
+func DecodeJson() {
+	jsonDataFromWeb := []byte(`
+	{
+		"courseName": "ReactJs bootcamp",
+		"Price": 299,
+		"website": "LearnCodeOnline.in",
+		"tags": ["web-dev", "js"]
+	}
+	`)
+
+	// golang is checking whether the datas are in the correct json format
+
+	var lcoCourse course
+
+	checkValid := json.Valid(jsonDataFromWeb)
+
+	if checkValid {
+		fmt.Println("JSON was valid")
+		json.Unmarshal(jsonDataFromWeb, &lcoCourse) // we don't want to send copies
+		// that's why we use reference
+		fmt.Printf("%#v\n", lcoCourse) // to print interfaces %#v
+	} else {
+		fmt.Println("JSON WAS NOT VALID")
+	}
+
+	// some cases where we want to add data in to key value pair
+
+	var myOnlineData map[string]interface{}        // as I don't know the `value`` is all time string
+	json.Unmarshal(jsonDataFromWeb, &myOnlineData) //we are passing reference, not copy
+	fmt.Printf("%#v\n", myOnlineData)
+
+	for k, v := range myOnlineData {
+		fmt.Printf("key is %v and value is %v and Type is %T\n", k, v, v)
+	}
 }
