@@ -99,7 +99,14 @@ func createOneCourse(c *gin.Context) {
 	decoder := json.NewDecoder(c.Request.Body)
 
 	if err := decoder.Decode(&course); err != nil {
-
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
+
+	courses = append(courses, course)
+
+	c.JSON(http.StatusCreated, course)
 
 }
