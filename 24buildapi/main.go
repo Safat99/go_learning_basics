@@ -80,3 +80,26 @@ func getSingleCourse(c *gin.Context) {
 	// json.NewEncoder(c.Writer).Encode("No Course found with the given id")
 	// return
 }
+
+func createOneCourse(c *gin.Context) {
+
+	fmt.Println("------------Create One course-------")
+	c.Header("Content-Type", "application/json")
+
+	// what if: body is empty
+	if c.Request.Body == nil {
+		c.JSON(http.StatusNoContent, gin.H{
+			"error": "Please send some data",
+		})
+	}
+
+	// what about {} -->> user is sending {}
+
+	var course Course
+	decoder := json.NewDecoder(c.Request.Body)
+
+	if err := decoder.Decode(&course); err != nil {
+
+	}
+
+}
