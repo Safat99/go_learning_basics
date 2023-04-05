@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +34,7 @@ func main() {
 	r := gin.Default()
 	r.GET("/", serveHome)
 	r.GET("/all", getAllCourses)
+	r.GET("/course/:id", getSingleCourse)
 
 	r.Run(":8080")
 }
@@ -58,5 +60,23 @@ func getAllCourses(c *gin.Context) {
 
 func getSingleCourse(c *gin.Context) {
 	fmt.Println("------------Getting One course-------")
+	c.Header("Content-Type", "application/json")
 
+	// grab id from request
+	id := c.Param("id")
+
+	// loop through courses and find matching id and return the response
+	for _, course := range courses {
+		if course.CourseId == id {
+			json.NewEncoder(c.Writer).Encode(course) // line for mux
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": "User not found",
+	})
+
+	// json.NewEncoder(c.Writer).Encode("No Course found with the given id")
+	// return
 }
