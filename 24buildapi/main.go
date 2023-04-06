@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,16 +27,18 @@ type Author struct {
 var courses []Course
 
 // middleware, helper -- file
-func IsEmpty(c *Course) bool {
-	return c.CourseId == "" && c.CourseName == ""
+func (c *Course) IsEmpty() bool {
+	// return c.CourseId == "" && c.CourseName == ""
+	return c.CourseName == ""
 }
 
 func main() {
 
 	r := gin.Default()
 	r.GET("/", serveHome)
-	r.GET("/all", getAllCourses)
+	r.GET("/course/all", getAllCourses)
 	r.GET("/course/:id", getSingleCourse)
+	r.POST(("/course/add"), createOneCourse)
 
 	r.Run(":8080")
 }
@@ -87,11 +91,12 @@ func createOneCourse(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 
 	// what if: body is empty
-	if c.Request.Body == nil {
-		c.JSON(http.StatusNoContent, gin.H{
-			"error": "Please send some data",
-		})
-	}
+	// if c.Request.Body == nil {
+	// 	fmt.Println("please send some data")
+	// 	c.JSON(http.StatusNoContent, gin.H{
+	// 		"error": "Please send some data",
+	// 	})
+	// }
 
 	// what about {} -->> user is sending {}
 
@@ -105,6 +110,17 @@ func createOneCourse(c *gin.Context) {
 		return
 	}
 
+	// checking isEmpty
+	if course.IsEmpty() {
+		c.JSON(http.StatusOK, gin.H{
+			"error": "course is Empty. Please send some data",
+		})
+		return
+	}
+
+	// generate a unique id, convert into string
+	// append course into course
+	course.CourseId = strconv.Itoa(rand.Intn(100))
 	courses = append(courses, course)
 
 	c.JSON(http.StatusCreated, course)
