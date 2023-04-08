@@ -25,7 +25,7 @@ type Author struct {
 var courses []Course
 
 // middleware, helper -- file
-func IsEmpty(c *Course) bool {
+func (c *Course) IsEmpty() bool {
 	return c.CourseId == "" && c.CourseName == ""
 }
 
@@ -104,6 +104,10 @@ func createOneCourse(c *gin.Context) {
 		})
 		return
 	}
+
+	// if course.IsEmpty() {
+
+	// }
 
 	courses = append(courses, course)
 
