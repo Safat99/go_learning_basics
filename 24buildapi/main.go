@@ -172,7 +172,9 @@ func deleteOneCourse(c *gin.Context) {
 			isFound = true
 			courses = append(courses[:index], courses[index+1:]...)
 
-			c.JSON(http.StatusOK, course)
+			c.JSON(http.StatusOK, gin.H{
+				"message": "course id " + id + " removed successfully!!!",
+			})
 			return
 		}
 	}
