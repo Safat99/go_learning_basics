@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,6 +39,9 @@ func main() {
 	r.GET("/course/all", getAllCourses)
 	r.GET("/course/:id", getSingleCourse)
 	r.POST(("/course/add"), createOneCourse)
+	r.PUT("/course/update/:id", updateOneCourse)
+	r.DELETE("/course/delete/:id", deleteOneCourse)
+	r.DELETE("/course/all", deleteAllCourse)
 
 	r.Run(":8080")
 }
@@ -106,6 +111,8 @@ func createOneCourse(c *gin.Context) {
 		return
 	}
 
+	course.CourseId = strconv.Itoa(rand.Intn(100) + 1)
+
 	courses = append(courses, course)
 
 	c.JSON(http.StatusCreated, course)
@@ -119,9 +126,12 @@ func updateOneCourse(c *gin.Context) {
 	// grab the id
 	id := c.Param("id")
 
+	var isFound bool = false
+
 	// loop, find matching id, remove, add with given id
 	for index, course := range courses {
 		if course.CourseId == id {
+			isFound = true
 			courses = append(courses[:index], courses[index+1:]...)
 
 			var course Course
@@ -132,9 +142,58 @@ func updateOneCourse(c *gin.Context) {
 				})
 				return
 			}
+
 			course.CourseId = id
 			courses = append(courses, course)
+
+			c.JSON(http.StatusOK, course)
+			return
 		}
 	}
+
+	if !isFound {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "no course found against " + id + " id",
+		})
+	}
+
+}
+
+func deleteOneCourse(c *gin.Context) {
+	fmt.Println("Deleting one course")
+	c.Header("Content-Type", "application/json")
+
+	// grab the id
+	id := c.Param("id")
+	var isFound bool = false
+
+	for index, course := range courses {
+		if course.CourseId == id {
+			isFound = true
+			courses = append(courses[:index], courses[index+1:]...)
+
+			c.JSON(http.StatusOK, course)
+			return
+		}
+	}
+
+	if !isFound {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "no course found against " + id + " id",
+		})
+		return
+	}
+
+}
+
+func deleteAllCourse(c *gin.Context) {
+	fmt.Println("----------deleting all courses-------")
+	c.Header("Content-Type", "application/json")
+
+	courses = nil
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "all courses are removed!!!",
+	})
 
 }
