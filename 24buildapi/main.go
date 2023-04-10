@@ -34,7 +34,7 @@ func (c *Course) IsEmpty() bool {
 
 func main() {
 
-	r := gin.Default()
+	r := gin.Default() // configures router with default middlewares
 	r.GET("/", serveHome)
 	r.GET("/course/all", getAllCourses)
 	r.GET("/course/:id", getSingleCourse)
