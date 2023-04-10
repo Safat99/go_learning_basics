@@ -2,10 +2,13 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"mongoGo/model"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,7 +40,8 @@ func init() {
 
 }
 
-// mongodb helpers -- file
+// ----------------------mongodb helpers -- file
+// they are all lowercased
 
 // inserting 1 record
 func insertOneMovie(movie model.Netflix) {
@@ -112,4 +116,19 @@ func getAllMovies() []primitive.M {
 
 	defer cur.Close(context.Background())
 	return movies
+}
+
+// Actual controllers -- file
+// they are usually in this file and db helpers go in the seperate file
+
+func GetAllMovies(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	allmovies := getAllMovies()
+	json.NewEncoder(w).Encode(allmovies)
+}
+
+func GetAllMyMovies(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	allmovies := getAllMovies()
+	c.JSON(http.StatusOK, allmovies)
 }
