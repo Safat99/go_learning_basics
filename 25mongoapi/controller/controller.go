@@ -88,3 +88,28 @@ func deleteAllMovies() int64 {
 	fmt.Println("total number of movies deleted: ", deleteResult.DeletedCount)
 	return deleteResult.DeletedCount
 }
+
+// get all movies from database
+// we will not find a value...we will find a cursor...we will have to
+// loop through over that
+func getAllMovies() []primitive.M {
+	cur, err := collection.Find(context.Background(), bson.D{{}})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var movies []primitive.M // represents bson documents as a map ...more reliable than bson.M
+
+	for cur.Next(context.Background()) {
+		var movie bson.M
+		err := cur.Decode(&movie)
+		if err != nil {
+			log.Fatal(err)
+		}
+		movies = append(movies, movie)
+	}
+
+	defer cur.Close(context.Background())
+	return movies
+}
