@@ -7,6 +7,7 @@ import (
 	"log"
 	"mongoGo/model"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -54,7 +55,7 @@ func insertOneMovie(movie model.Netflix) {
 }
 
 // update 1 record
-func updateOneMovie(movieId string) {
+func updateOneMovie(movieId string) int64 {
 	id, _ := primitive.ObjectIDFromHex(movieId)
 	filter := bson.M{"_id": id} // bson.M vs bson.D
 	update := bson.M{"$set": bson.M{"watched": true}}
@@ -65,10 +66,11 @@ func updateOneMovie(movieId string) {
 	}
 
 	fmt.Println("total records are modified: ", result.ModifiedCount)
+	return result.ModifiedCount
 }
 
 // delete 1 record
-func deleteOneMovie(movieId string) {
+func deleteOneMovie(movieId string) int64 {
 	id, _ := primitive.ObjectIDFromHex(movieId)
 	filter := bson.M{"_id": id}
 	deleteCount, err := collection.DeleteOne(context.Background(), filter)
@@ -77,7 +79,8 @@ func deleteOneMovie(movieId string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Movie got deleted with delete count: ", deleteCount)
+	fmt.Println("Movie got deleted with delete count: ", deleteCount.DeletedCount)
+	return deleteCount.DeletedCount
 }
 
 // delete all records from mongodb
@@ -131,4 +134,43 @@ func GetAllMyMovies(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	allmovies := getAllMovies()
 	c.JSON(http.StatusOK, allmovies)
+}
+
+func createMovie(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+
+	var movie model.Netflix
+	decoder := json.NewDecoder(c.Request.Body)
+	err := decoder.Decode(&movie)
+	if err != nil {
+		log.Fatal(err)
+	}
+	insertOneMovie(movie)
+	c.JSON(201, gin.H{
+		"message": "movie created",
+	})
+
+}
+
+func UpdateMovie(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+
+	id := c.Param("id")
+	resultCount := updateOneMovie(id)
+
+	c.JSON(201, gin.H{
+		"message": "total" + strconv.Itoa(int(resultCount)) + " values updated",
+	})
+
+}
+
+func DeleteMovie(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+
+	id := c.Param("id")
+	deleteCount := deleteOneMovie(id)
+
+	c.JSON(201, gin.H{
+		"message": "total" + strconv.Itoa(int(deleteCount)) + " values deleted",
+	})
 }
