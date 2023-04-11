@@ -124,11 +124,11 @@ func getAllMovies() []primitive.M {
 // Actual controllers -- file
 // they are usually in this file and db helpers go in the seperate file
 
-func GetAllMovies(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	allmovies := getAllMovies()
-	json.NewEncoder(w).Encode(allmovies)
-}
+// func GetAllMovies(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+// 	allmovies := getAllMovies()
+// 	json.NewEncoder(w).Encode(allmovies)
+// }
 
 func GetAllMyMovies(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
@@ -136,7 +136,7 @@ func GetAllMyMovies(c *gin.Context) {
 	c.JSON(http.StatusOK, allmovies)
 }
 
-func createMovie(c *gin.Context) {
+func CreateMovie(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 
 	var movie model.Netflix
@@ -152,7 +152,7 @@ func createMovie(c *gin.Context) {
 
 }
 
-func UpdateMovie(c *gin.Context) {
+func MarkedAsWatched(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 
 	id := c.Param("id")
